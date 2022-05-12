@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/index.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <main  class="flex_center">
+
+
+      <div class="login flex_center"  v-if="!isLogin">
+        <input type="file" @change="addImage" id="file">
+        <input type="text" name="username" placeholder="请输入名称" class="user" v-model="username">
+        <button  @click="enter" class="loginBtn">登入</button>
+      </div>
+
+      <div class="box" v-else>
+
+        <div class="box_header flex_align">
+          <span class="now">当前在线人数：{{count}}</span>
+        </div>
+
+        <div class="msg">
+          <div class="msg_item" v-for="(item,index) in speaksData" :key="index">
+              <!-- <span class="msg_tip">xx退出了房间</span>
+              <span class="msg_tip">xx退出了房间</span> -->
+              <div class="user"></div>
+          </div>
+
+     
+        </div>
+        <div class="sentBox ">
+
+          <!-- <input type="textarea"> -->
+
+          <textarea name="msg" id="msg" v-model="msg"></textarea>
+          <button class="sendBtn" @click="sendMsg">发送</button>
+        </div>
+      </div>
+
+
+    </main>
+
+
+  </div>
+  <script>
+    const app = new Vue({
+      el: "#app",
+      data(){
+        return {
+          socket:'',
+          count:0,
+          username:'',
+          isLogin:false,
+          speaksData:[],
+          headImgUrl:'',
+          msg:'',
+          uploadfile:'',
+        }
+      },
+      methods:{
+        enter(){
+          if (
+            /^\s*$/g.test(this.username) 
+          ) {
+            return;
+          }
+          this.socket = io("http://localhost:9527"); 
+          // 当前在线人数
+          this.socket.on('count',(data)=>{
+            console.log(data);
+            this.count = data
+          })
+          console.log(this.username);
+          // 用户名、头像发送给服务
+          this.socket.emit("username", this.username);
+          this.socket.emit("sendHeadImg", this.headImgUrl);
+
+          // 接收进入事件
+          this.socket.on("somebodyEnter", (data) => {
+            this.speaksDataAdd(data);
+          });
+
+          // 接受说话
+          this.socket.on("somebodySpeak", (data) => {
+            this.speaksDataAdd(data);
+          });
+          // 接收离开事件
+          this.socket.on("somebodyLeave", (data) => {
+            this.speaksDataAdd(data);
+          });
+     
+
+          this.isLogin = true
+          // console.log(111);
+        },
+        addImage(){
+          var img = document.getElementById("file").files[0];
+          let fr = new FileReader();
+          fr.readAsDataURL(img);
+          fr.onload = () => {
+            this.uploadfile = img.name;
+            this.headImgUrl = fr.result;
+          };
+        },
+        sendMsg(){
+          this.socket.emit("speak", this.msg);
+        },
+        speaksDataAdd(data) {
+            this.speaksData.push(data);
+
+            console.log(this.speaksData);
+        },
+      }
+    })
+
+    console.log(app);
+
+  </script>
+</body>
+</html>
