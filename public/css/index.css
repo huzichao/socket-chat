@@ -46,8 +46,12 @@ main {
   color: #727d88;
 }
 
+
 .box_header{
   height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .loginBtn{
   width: 250px;
@@ -57,6 +61,8 @@ main {
 button {
   cursor: pointer;
 }
+
+
 
 
 .box{
@@ -77,10 +83,63 @@ button {
   overflow-y: auto;
 }
 .msg_item{
+  min-height: 40px;
+  padding: 0 10px;
+  display: flex;
+  margin: 10px 0;
+}
+
+.msg_item .userBox{
+  display:flex;
+  width: 100%;
   height: 40px;
 
 }
+.item {
+  width: 250px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin: 15px 0;
+  display: flex;
+}
 
+.username{
+  line-height: 35px;
+}
+
+ .unameInput {
+  height: 30px;
+  border-radius: 5px;
+  border: none;
+  padding: 0 0 0 15px;
+  outline-color: #0d7370;
+}
+.upload {
+  text-indent: 16px;
+    flex: 1;
+  line-height: 35px;
+  display: inline-block;
+  width: 178px;
+  cursor: pointer;
+  color: #fff;
+  text-decoration: underline;
+}
+
+
+.flex_r{
+  justify-content: flex-end;
+}
+
+.m_r{
+  margin-right: 10px;
+}
+.m_l{
+  margin-left: 10px;
+}
 .msg_item .msg_tip{
   display: inline-block;
   width: 100%;
@@ -88,8 +147,38 @@ button {
   font-size: 14px;
   color: #727d88;
 }
+.imgBox{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
+}
+.imgBox img{
+  display: inline-block;
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+}
 
+.imgBox .u_name{
+  width:40px;
+  font-size: 12px;
+  text-align: center;
+  color: #727d88;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.msg_item .u_content{
+  display: inline-block;
+  max-width: 700px;
+  border-radius: 10px;
+  background:#ccc;
+  line-height: 30px;
+  padding: 0 20px;
+}
 
 .sentBox {
   width: 100%;

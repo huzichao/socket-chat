@@ -16,22 +16,49 @@
 
 
       <div class="login flex_center"  v-if="!isLogin">
-        <input type="file" @change="addImage" id="file">
+        <div class="item">
+          <p class="username">头&emsp;像:</p>
+          <label for="file" class="upload">
+          {{uploadfile}}
+          </label>
+          <input class="unameInput"
+                  type="file"
+                  id="file"
+                  style="display: none"
+                  v-on:change="addImage"/>
+        </div>
+        <!-- <input type="file" @change="addImage" id="file"> -->
         <input type="text" name="username" placeholder="请输入名称" class="user" v-model="username">
         <button  @click="enter" class="loginBtn">登入</button>
       </div>
 
       <div class="box" v-else>
 
-        <div class="box_header flex_align">
+        <div class="box_header">
           <span class="now">当前在线人数：{{count}}</span>
+          <span class="now">{{username}}</span>
         </div>
 
         <div class="msg">
           <div class="msg_item" v-for="(item,index) in speaksData" :key="index">
-              <!-- <span class="msg_tip">xx退出了房间</span>
-              <span class="msg_tip">xx退出了房间</span> -->
-              <div class="user"></div>
+              <span class="msg_tip" v-if="item.state == 0">{{item.username}}退出了房间</span>
+              <span class="msg_tip" v-if="item.state == 1 ">{{item.username}}进入了房间</span>
+              <div class="userBox" v-if="item.state == 2 && item.username != username">
+                <span class="imgBox" >
+                 <img :src="headImgUrl" alt="头像">
+                  <span class="u_name">{{item.username}}</span>
+                </span>
+                <span class="u_content m_l">{{item.msg}}</span>
+              </div>
+
+              <div class="userBox flex_r" v-if="item.state == 2 && item.username == username">
+           
+                <span class="u_content m_r" >{{item.msg}}</span>
+                <span class="imgBox" >
+                  <img :src="headImgUrl" alt="头像">
+                   <span class="u_name">{{item.username}}</span>
+                 </span>
+              </div>
           </div>
 
      
@@ -62,23 +89,23 @@
           speaksData:[],
           headImgUrl:'',
           msg:'',
-          uploadfile:'',
+          uploadfile:'上传图片',
         }
       },
       methods:{
         enter(){
           if (
-            /^\s*$/g.test(this.username) 
+            /^\s*$/g.test(this.username) ||
+            /^\s*$/g.test(this.headImgUrl)
           ) {
             return;
           }
           this.socket = io("http://localhost:9527"); 
           // 当前在线人数
           this.socket.on('count',(data)=>{
-            console.log(data);
             this.count = data
           })
-          console.log(this.username);
+
           // 用户名、头像发送给服务
           this.socket.emit("username", this.username);
           this.socket.emit("sendHeadImg", this.headImgUrl);
@@ -90,6 +117,7 @@
 
           // 接受说话
           this.socket.on("somebodySpeak", (data) => {
+            console.log(data);
             this.speaksDataAdd(data);
           });
           // 接收离开事件
@@ -111,17 +139,23 @@
           };
         },
         sendMsg(){
-          this.socket.emit("speak", this.msg);
+
+          let obj = {
+            username:this.username,
+            msg:this.msg
+          }
+
+          // this.socket.emit("speak", this.msg);
+          this.socket.emit("speak", JSON.stringify(obj));
         },
         speaksDataAdd(data) {
+          console.log(this.headImgUrl);
             this.speaksData.push(data);
-
             console.log(this.speaksData);
         },
       }
     })
 
-    console.log(app);
 
   </script>
 </body>
